@@ -144,17 +144,6 @@ If you use this method or this code in your research, please cite as:
      pages={962--971},
      year={2021}
    }
-   
-   @inproceedings{jia2022learning,
-     title={Learning disentangled attribute representations for robust pedestrian attribute recognition},
-     author={Jia, Jian and Gao, Naiyu and He, Fei and Chen, Xiaotang and Huang, Kaiqi},
-     booktitle={Proceedings of the AAAI Conference on Artificial Intelligence},
-     volume={36},
-     number={1},
-     pages={1069--1077},
-     year={2022}
-   }
-    
 
 
 
