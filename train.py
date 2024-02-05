@@ -454,8 +454,7 @@ def argument_parser():
 
     parser.add_argument(
         "--cfg", help="decide which cfg to use", type=str,
-        default="./configs/pedes_baseline/pa100k.yaml",
-
+        default="./configs/pedes_baseline/rap_zs.yaml",
     )
 
     parser.add_argument("--debug", type=str2bool, default="true")
