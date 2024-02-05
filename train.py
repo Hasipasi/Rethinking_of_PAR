@@ -7,7 +7,7 @@ from collections import defaultdict
 from datetime import datetime
 
 import numpy as np
-from mmcv.cnn import get_model_complexity_info
+#from mmcv.cnn import get_model_complexity_info
 from torch.utils.tensorboard import SummaryWriter
 from visdom import Visdom
 
@@ -47,7 +47,7 @@ torch.autograd.set_detect_anomaly(True)
 
 
 def main(cfg, args):
-    set_seed(605)
+    set_seed(args.seed)
     exp_dir = os.path.join('exp_result', cfg.DATASET.NAME)
 
     model_dir, log_dir = get_model_log_path(exp_dir, cfg.NAME)
@@ -445,6 +445,8 @@ def argument_parser():
                         type=int)
     parser.add_argument('--dist_bn', type=str, default='',
                         help='Distribute BatchNorm stats between nodes after each epoch ("broadcast", "reduce", or "")')
+
+    parser.add_argument('--seed', type=int, default=605, help='random seed')
 
     args = parser.parse_args()
 
