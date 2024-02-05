@@ -274,7 +274,7 @@ def trainer(cfg, args, epoch, model, model_ema, train_loader, valid_loader, crit
 
         lr = optimizer.param_groups[1]['lr']
 
-        train_loss, train_gt, train_probs, train_imgs, train_logits, train_loss_mtr = batch_trainer(
+        train_loss, train_gt, train_probs, train_imgs, train_logits, train_loss_mtr, attr_names = batch_trainer(
             cfg,
             args=args,
             epoch=e,
@@ -299,7 +299,7 @@ def trainer(cfg, args, epoch, model, model_ema, train_loader, valid_loader, crit
 
             if args.distributed:
                 distribute_bn(model_ema, args.world_size, args.dist_bn == 'reduce')
-            valid_loss, valid_gt, valid_probs, valid_imgs, valid_logits, valid_loss_mtr = valid_trainer(
+            valid_loss, valid_gt, valid_probs, valid_imgs, valid_logits, valid_loss_mtr, attr_names = valid_trainer(
                 cfg,
                 args=args,
                 epoch=e,
@@ -309,7 +309,7 @@ def trainer(cfg, args, epoch, model, model_ema, train_loader, valid_loader, crit
                 loss_w=loss_w
             )
         else:
-            valid_loss, valid_gt, valid_probs, valid_imgs, valid_logits, valid_loss_mtr = valid_trainer(
+            valid_loss, valid_gt, valid_probs, valid_imgs, valid_logits, valid_loss_mtr, attr_names = valid_trainer(
                 cfg,
                 args=args,
                 epoch=e,

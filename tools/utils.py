@@ -47,6 +47,7 @@ def to_scalar(vt):
 
 # makes the random numbers predictable
 def set_seed(rand_seed):
+    print("Seed = " + str(rand_seed))
     np.random.seed(rand_seed)
     random.seed(rand_seed)
     torch.backends.cudnn.enabled = True
@@ -317,7 +318,7 @@ def load_ckpt(modules_optims, ckpt_file, load_to_cpu=True, verbose=True):
 #     return unwrap_fn(model).state_dict()
 
 
-def save_ckpt(model, ckpt_files, epoch, metric):
+def save_ckpt(model, ckpt_files, epoch, metric, pkl_name=''):
     """
     Note:
         torch.save() reserves device type and id of tensors to save.
