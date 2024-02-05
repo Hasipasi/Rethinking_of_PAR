@@ -36,7 +36,7 @@ def batch_trainer(cfg, args, epoch, model, model_ema, train_loader, criterion, o
 
     lr = optimizer.param_groups[1]['lr']
 
-    for step, (imgs, gt_label, imgname) in enumerate(train_loader):
+    for step, (imgs, gt_label, imgname, attr_names) in enumerate(train_loader):
         iter_num = epoch * len(train_loader) + step
 
         batch_time = time.time()
@@ -110,7 +110,7 @@ def batch_trainer(cfg, args, epoch, model, model_ema, train_loader, criterion, o
     if args.local_rank == 0:
         print(f'Epoch {epoch}, LR {lr}, Train_Time {time.time() - epoch_time:.2f}s, Loss: {loss_meter.avg:.4f}')
 
-    return train_loss, gt_label, preds_probs, imgname_list, preds_logits, loss_mtr_list
+    return train_loss, gt_label, preds_probs, imgname_list, preds_logits, loss_mtr_list, attr_names
 
 
 def valid_trainer(cfg, args, epoch, model, valid_loader, criterion, loss_w=[1, ]):
@@ -125,7 +125,7 @@ def valid_trainer(cfg, args, epoch, model, valid_loader, criterion, loss_w=[1, ]
     loss_mtr_list = []
 
     with torch.no_grad():
-        for step, (imgs, gt_label, imgname) in enumerate(tqdm(valid_loader)):
+        for step, (imgs, gt_label, imgname, attr_name) in enumerate(tqdm(valid_loader)):
             imgs = imgs.cuda()
             gt_label = gt_label.cuda()
             gt_list.append(gt_label.cpu().numpy())
@@ -161,4 +161,4 @@ def valid_trainer(cfg, args, epoch, model, valid_loader, criterion, loss_w=[1, ]
     preds_probs = np.concatenate(preds_probs, axis=0)
     preds_logits = np.concatenate(preds_logits, axis=0)
 
-    return valid_loss, gt_label, preds_probs, imgname_list, preds_logits, loss_mtr_list
+    return valid_loss, gt_label, preds_probs, imgname_list, preds_logits, loss_mtr_list, attr_name

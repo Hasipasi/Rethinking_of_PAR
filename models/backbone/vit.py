@@ -28,7 +28,7 @@ import torch
 import torch.nn as nn
 
 from timm.data import IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD
-from torch._six import container_abcs
+import collections.abc as container_abcs
 import torch.nn.functional as F
 import torch.utils.checkpoint as checkpoint
 

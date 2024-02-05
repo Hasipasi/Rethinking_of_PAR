@@ -11,12 +11,18 @@ from tools.function import get_pkl_rootpath
 
 class PedesAttr(data.Dataset):
 
-    def __init__(self, cfg, split, transform=None, target_transform=None, idx=None):
+    def __init__(self, cfg, split, transform=None, target_transform=None, idx=None, is_generated=False, pkl_name=''):
 
         assert cfg.DATASET.NAME in ['PETA', 'PA100k', 'RAP', 'RAP2'], \
             f'dataset name {cfg.DATASET.NAME} is not exist'
 
-        data_path = get_pkl_rootpath(cfg.DATASET.NAME, cfg.DATASET.ZERO_SHOT)
+        if is_generated:
+            data_path = get_pkl_rootpath(cfg.DATASET.NAME, cfg.DATASET.ZERO_SHOT, True)
+        else:
+            data_path = get_pkl_rootpath(cfg.DATASET.NAME, cfg.DATASET.ZERO_SHOT)
+
+        if pkl_name:
+            data_path = pkl_name
 
         print("which pickle", data_path)
 
@@ -27,7 +33,14 @@ class PedesAttr(data.Dataset):
         attr_label = dataset_info.label
         attr_label[attr_label == 2] = 0
         self.attr_id = dataset_info.attr_name
+        try:
+            self.attr_id.remove('Age46-60')
+            print('removed Age46-60')
+        except:
+            pass
         self.attr_num = len(self.attr_id)
+
+        self.return_attrs = self.attr_id
 
         if 'label_idx' not in dataset_info.keys():
             print(' this is for zero shot split')
@@ -35,6 +48,11 @@ class PedesAttr(data.Dataset):
             self.eval_attr_num = self.attr_num
         else:
             self.eval_attr_idx = dataset_info.label_idx.eval
+            try:
+                self.eval_attr_idx.remove(38)
+                print('removed 38----------------------------------------------------------------')
+            except:
+                pass
             self.eval_attr_num = len(self.eval_attr_idx)
 
             assert cfg.DATASET.LABEL in ['all', 'eval', 'color'], f'key word {cfg.DATASET.LABEL} error'
@@ -89,7 +107,7 @@ class PedesAttr(data.Dataset):
         if self.target_transform:
             gt_label = gt_label[self.target_transform]
 
-        return img, gt_label, imgname,  # noisy_weight
+        return img, gt_label, imgname, self.return_attrs, # noisy_weight
 
     def __len__(self):
         return len(self.img_id)

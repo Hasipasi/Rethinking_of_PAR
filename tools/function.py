@@ -94,12 +94,15 @@ class LogVisual:
             self.val_loss.append(kwargs['val_loss'])
 
 
-def get_pkl_rootpath(dataset, zero_shot):
+def get_pkl_rootpath(dataset, zero_shot, transfer=False):
     root = os.path.join("./data", f"{dataset}")
     if zero_shot:
         data_path = os.path.join(root, 'dataset_zs_run0.pkl')
     else:
-        data_path = os.path.join(root, 'dataset_all.pkl')  #
+        data_path = os.path.join(root, 'dataset_all.pkl')
+        
+    if transfer:
+        data_path = os.path.join(root, 'dataset_generated.pkl')
 
     return data_path
 

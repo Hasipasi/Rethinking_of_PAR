@@ -18,6 +18,10 @@ class BCELoss(nn.Module):
         self.smoothing = None
 
     def forward(self, logits, targets):
+        #if a target is -1, it means that it is not a target that is undefined
+        remove_idx = torch.where(targets == -1)
+        targets[remove_idx] = 0 #undefined targets are set to 0
+
         logits = logits[0]
 
         if self.smoothing is not None:
@@ -31,7 +35,8 @@ class BCELoss(nn.Module):
 
             loss_m = (loss_m * sample_weight.cuda())
 
-        # losses = loss_m.sum(1).mean() if self.size_sum else loss_m.mean()
+        loss_m[remove_idx] = 0 #set loss of undefined targets to 0 , not considered in the gradient
+
         loss = loss_m.sum(1).mean() if self.size_sum else loss_m.sum()
 
         return [loss], [loss_m]
