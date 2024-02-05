@@ -60,7 +60,7 @@ def save_label_wise_metrics_to_csv(results, cfg=None, csv_files = ['label_pos_re
     """
     import csv
     import os
-    root_path = "/net/cremi/bbodis/espaces/travail/Rethinking_of_PAR/label_wise_metrics/"
+    root_path = "/home/bodis/Documents/GitHub/Rethinking_of_PAR/label_wise_metrics/"
     root_path += 'train/' if train else ''
     root_path
     pkl_name += '_'+ str(seed)
