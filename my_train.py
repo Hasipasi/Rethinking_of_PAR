@@ -1,5 +1,5 @@
 import os
-# os.environ['CUDA_VISIBLE_DEVICES'] = '3'
+# os.environ['{CUDA_VISIBLE_DEVICES}'] = '3'
 
 import argparse
 import pickle
@@ -39,8 +39,6 @@ from losses import bceloss, scaledbceloss
 from models import base_block
 
 
-
-
 # torch.backends.cudnn.benchmark = True
 # torch.autograd.set_detect_anomaly(True)
 torch.autograd.set_detect_anomaly(True)
@@ -51,8 +49,12 @@ def main(cfg, args):
     exp_dir = os.path.join('exp_result', cfg.DATASET.NAME)
 
     model_dir, log_dir = get_model_log_path(exp_dir, cfg.NAME)
-    stdout_file = os.path.join(log_dir, f'stdout_{time_str()}.txt')
-    save_model_path = os.path.join(model_dir, f'ckpt_max_{time_str()}.pth')
+    pkl_name = args.pkl.split('/')[-1].split('.')[0]    
+
+
+    stdout_file = os.path.join(log_dir, f'stdout_{time_str()}_{pkl_name}.txt')
+
+    save_model_path = os.path.join(model_dir, f'ckpt_max_{time_str()}_{pkl_name}.pth')
 
     visdom = None
     if cfg.VIS.VISDOM:
@@ -78,7 +80,7 @@ def main(cfg, args):
         args.distributed = None
 
     args.world_size = 1
-    args.rank = 0  # global rank
+    args.rank = 0  # global rankm
 
     if args.distributed:
         args.device = 'cuda:%d' % args.local_rank
@@ -86,7 +88,7 @@ def main(cfg, args):
         torch.distributed.init_process_group(backend='nccl', init_method='env://')
         args.world_size = torch.distributed.get_world_size()
         args.rank = torch.distributed.get_rank()
-        print(f'use GPU{args.device} for training')
+        print(f'use GPU{args.device} for trainming')
         print(args.world_size, args.rank)
 
     if args.local_rank == 0:
@@ -97,11 +99,18 @@ def main(cfg, args):
         print(train_tsfm)
 
     if cfg.DATASET.TYPE == 'pedes':
-        train_set = PedesAttr(cfg=cfg, split=cfg.DATASET.TRAIN_SPLIT, transform=train_tsfm,
-                              target_transform=cfg.DATASET.TARGETTRANSFORM)
+        train_set = PedesAttr(cfg=cfg, 
+                              split=cfg.DATASET.TRAIN_SPLIT, 
+                              transform=train_tsfm,
+                              target_transform=cfg.DATASET.TARGETTRANSFORM,
+                              pkl_name=args.pkl)
 
-        valid_set = PedesAttr(cfg=cfg, split=cfg.DATASET.VAL_SPLIT, transform=valid_tsfm,
-                              target_transform=cfg.DATASET.TARGETTRANSFORM)
+        valid_set = PedesAttr(cfg=cfg, 
+                              split=cfg.DATASET.VAL_SPLIT, 
+                              transform=valid_tsfm,
+                              target_transform=cfg.DATASET.TARGETTRANSFORM) 
+                              #here we do not add the PKL file name, so the validation set will use the default one for sure
+
     elif cfg.DATASET.TYPE == 'multi_label':
         train_set = COCO14(cfg=cfg, split=cfg.DATASET.TRAIN_SPLIT, transform=train_tsfm,
                            target_transform=cfg.DATASET.TARGETTRANSFORM)
@@ -153,6 +162,8 @@ def main(cfg, args):
     )
 
     model = FeatClassifier(backbone, classifier, bn_wd=cfg.TRAIN.BN_WD)
+
+    
     if args.local_rank == 0:
         print(f"backbone: {cfg.BACKBONE.TYPE}, classifier: {cfg.CLASSIFIER.NAME}")
         print(f"model_name: {cfg.NAME}")
@@ -176,6 +187,7 @@ def main(cfg, args):
 
     if cfg.RELOAD.TYPE:
         model = get_reload_weight(model_dir, model, pth=cfg.RELOAD.PTH)
+
 
     loss_weight = cfg.LOSS.LOSS_WEIGHT
 
@@ -361,7 +373,7 @@ def trainer(cfg, args, epoch, model, model_ema, train_loader, valid_loader, crit
             if cur_metric > maximum:
                 maximum = cur_metric
                 best_epoch = e
-                save_ckpt(model, path, e, maximum)
+                save_ckpt(model, path, e, maximum, args.pkl)
                 #get label wise results
             label_wise_results = get_pedestrian_metrics_labelwise(valid_gt, 
                                                                   valid_probs, 
@@ -374,12 +386,15 @@ def trainer(cfg, args, epoch, model, model_ema, train_loader, valid_loader, crit
             save_label_wise_metrics_to_csv(label_wise_results,
                                             cfg=cfg,
                                             epoch=e,
-                                            seed = args.seed)
+                                            pkl_name=args.pkl,
+                                            seed= args.seed)
             save_label_wise_metrics_to_csv(label_wise_results_train,
                                             cfg=cfg,
                                             epoch=e,
-                                            train=True,
-                                            seed = args.seed)
+                                            pkl_name=args.pkl,
+                                            train=True, 
+                                            seed= args.seed)
+            
 
             result_list[e] = {
                 'train_result': train_result,  # 'train_map': train_map,
@@ -454,7 +469,7 @@ def argument_parser():
 
     parser.add_argument(
         "--cfg", help="decide which cfg to use", type=str,
-        default="./configs/pedes_baseline/pa100k.yaml",
+        default="./configs/pedes_baseline/rap_zs.yaml",
 
     )
 
@@ -463,11 +478,12 @@ def argument_parser():
                         type=int)
     parser.add_argument('--dist_bn', type=str, default='',
                         help='Distribute BatchNorm stats between nodes after each epoch ("broadcast", "reduce", or "")')
-
+    parser.add_argument('--pkl', type=str, default='./data/RAP2/bald_1000_w_zs.pkl', help='pickle file path, if empty use pkl from config file')
+    
     parser.add_argument('--seed', type=int, default=605, help='random seed')
 
     args = parser.parse_args()
-
+    print(f"args: {args}")
     return args
 
 
