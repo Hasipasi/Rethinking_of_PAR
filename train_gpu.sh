@@ -11,7 +11,7 @@
 
 #CUDA_VISIBLE_DEVICES=0 python train.py --cfg ./configs/pedes_baseline/rapv2.yaml
 
-CUDA_VISIBLE_DEVICES=0 python train.py --cfg ./configs/pedes_baseline/rap_zs.yaml
+CUDA_VISIBLE_DEVICES=0 python train.py --cfg ./configs/pedes_baseline/rap_zs.yaml # original seed
 
 #CUDA_VISIBLE_DEVICES=0 python train.py --cfg ./configs/pedes_baseline/pa100k.yaml
 
