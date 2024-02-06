@@ -15,7 +15,7 @@ from configs import cfg, update_config
 from dataset.multi_label.coco import COCO14
 from dataset.augmentation import get_transform
 from metrics.ml_metrics import get_map_metrics, get_multilabel_metrics
-from metrics.pedestrian_metrics import get_pedestrian_metrics, get_pedestrian_metrics_labelwise, save_label_wise_metrics_to_csv
+from metrics.pedestrian_metrics import get_pedestrian_metrics, save_label_wise_metrics_to_csv
 from models.model_ema import ModelEmaV2
 from optim.adamw import AdamW
 from scheduler.cos_annealing_with_restart import CosineAnnealingLR_with_Restart
@@ -327,9 +327,28 @@ def trainer(cfg, args, epoch, model, model_ema, train_loader, valid_loader, crit
             lr_scheduler.step()
 
         if cfg.METRIC.TYPE == 'pedestrian':
-
-            train_result = get_pedestrian_metrics(train_gt, train_probs, index=None, cfg=cfg)
-            valid_result = get_pedestrian_metrics(valid_gt, valid_probs, index=None, cfg=cfg)
+            #calculate metrics label-wise and instance level
+            train_result = get_pedestrian_metrics(gt_label= train_gt, 
+                                                  preds_probs= train_probs, 
+                                                  attr_names= attr_names, 
+                                                  index=None, 
+                                                  cfg=cfg)
+            valid_result = get_pedestrian_metrics(gt_label= valid_gt, 
+                                                  preds_probs= valid_probs, 
+                                                  attr_names= attr_names, 
+                                                  index=None, 
+                                                  cfg=cfg)
+            #save label-wise metrics to csv in each epoch
+            save_label_wise_metrics_to_csv(train_result,
+                                            cfg=cfg,
+                                            epoch=e,
+                                            train=True,
+                                            seed = args.seed)
+            save_label_wise_metrics_to_csv(valid_result,
+                                            cfg=cfg,
+                                            epoch=e,
+                                            seed = args.seed)
+            
 
             if args.local_rank == 0:
                 print(f'Evaluation on train set, train losses {train_loss}\n',
@@ -363,23 +382,8 @@ def trainer(cfg, args, epoch, model, model_ema, train_loader, valid_loader, crit
                 best_epoch = e
                 save_ckpt(model, path, e, maximum)
                 #get label wise results
-            label_wise_results = get_pedestrian_metrics_labelwise(valid_gt, 
-                                                                  valid_probs, 
-                                                                  attr_names, 
-                                                                  cfg=cfg)
-            label_wise_results_train = get_pedestrian_metrics_labelwise(train_gt, 
-                                                                        train_probs, 
-                                                                        attr_names, 
-                                                                        cfg=cfg)
-            save_label_wise_metrics_to_csv(label_wise_results,
-                                            cfg=cfg,
-                                            epoch=e,
-                                            seed = args.seed)
-            save_label_wise_metrics_to_csv(label_wise_results_train,
-                                            cfg=cfg,
-                                            epoch=e,
-                                            train=True,
-                                            seed = args.seed)
+
+            
 
             result_list[e] = {
                 'train_result': train_result,  # 'train_map': train_map,
