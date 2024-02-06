@@ -41,7 +41,7 @@ import easydict as ED
 def read_csv_folder(results_folder, metrics=None):
     metrics = metrics or ['acc', 'prec', 'pos_recall','neg_recall', 'f1', 'ma']
     filenames = [f'label_{metric}.csv' for metric in metrics]
-    filenames = [os.path.join(results_folder, filename) for filename in filenames]
+    filenames = [(results_folder +"\\"+ filename) for filename in filenames]
     results = ED.EasyDict()
     for i, metric in enumerate(metrics):
         filename = filenames[i]
@@ -74,7 +74,7 @@ def read_multiple_csv_folders(results_folders, metrics=None):
             attrName = results.all[0].attrName[attridx]
             results[metric][attrName] = ED.EasyDict()
             results[metric][attrName].mean = np.mean([results.all[i][metric][attrName] for i, _ in enumerate(results_folders)], axis=0)
-            results[metric][attrName].std = np.mean([results.all[i][metric][attrName] for i, _ in enumerate(results_folders)], axis=0)
+            results[metric][attrName].std = np.std([results.all[i][metric][attrName] for i, _ in enumerate(results_folders)], axis=0)
     results.attrIdx = results.all[0].attrIdx
     results.attrName = results.all[0].attrName
     return results
@@ -104,7 +104,7 @@ def main(): #example usage
     plt.xlabel('Epoch')
     plt.ylabel('Metric Value')
     plt.ylim([0.7,1])
-    plt.xlim([0,9])
+    plt.xlim([0,19])
     plt.show()
 
 

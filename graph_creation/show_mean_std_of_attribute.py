@@ -1,20 +1,26 @@
 from read_csv import read_multiple_csv_folders
 from matplotlib import pyplot as plt
 
-train_results_folders = [   '/net/cremi/bbodis/espaces/travail/Rethinking_of_PAR/label_wise_metrics/train/RAP2/bald_0',
-                            '/net/cremi/bbodis/espaces/travail/Rethinking_of_PAR/label_wise_metrics/train/RAP2/bald_1_only',
-                            '/net/cremi/bbodis/espaces/travail/Rethinking_of_PAR/label_wise_metrics/train/RAP2/bald_2_only',
-                            '/net/cremi/bbodis/espaces/travail/Rethinking_of_PAR/label_wise_metrics/train/RAP2/bald_3_only' ]
+train_results_folders = [   'C:\\Users\\budai\\Downloads\\visualization\\visualization\\label_wise_metrics_new/train/RAP2/shirt_0_605',
+                            'C:\\Users\\budai\\Downloads\\visualization\\visualization\\label_wise_metrics_new/train/RAP2/shirt_1_605',
+                            'C:\\Users\\budai\\Downloads\\visualization\\visualization\\label_wise_metrics_new/train/RAP2/shirt_2_605',
+                            'C:\\Users\\budai\\Downloads\\visualization\\visualization\\label_wise_metrics_new/train/RAP2/shirt_3_605' ]
 
-val_results_folders = [     '/net/cremi/bbodis/espaces/travail/Rethinking_of_PAR/label_wise_metrics/RAP2/bald_0',
-                            '/net/cremi/bbodis/espaces/travail/Rethinking_of_PAR/label_wise_metrics/RAP2/bald_1_only',
-                            '/net/cremi/bbodis/espaces/travail/Rethinking_of_PAR/label_wise_metrics/RAP2/bald_2_only',
-                            '/net/cremi/bbodis/espaces/travail/Rethinking_of_PAR/label_wise_metrics/RAP2/bald_3_only' ]
 
-baseline_val_results_folders = ['/net/cremi/bbodis/espaces/travail/Rethinking_of_PAR/label_wise_metrics/base_train_metric_stdout']
-baseline_train_results_folders = ['/net/cremi/bbodis/espaces/travail/Rethinking_of_PAR/label_wise_metrics/base_train_metric_stdout/train']
+val_results_folders = [     'C:\\Users\\budai\\Downloads\\visualization\\visualization\\label_wise_metrics_new/RAP2/shirt_0_605',
+                            'C:\\Users\\budai\\Downloads\\visualization\\visualization\\label_wise_metrics_new/RAP2/shirt_1_605',
+                            'C:\\Users\\budai\\Downloads\\visualization\\visualization\\label_wise_metrics_new/RAP2/shirt_2_605',
+                            'C:\\Users\\budai\\Downloads\\visualization\\visualization\\label_wise_metrics_new/RAP2/shirt_3_605' ]
 
-attribute = "hs-BaldHead" # Specify the attribute here
+train_results_folders = [folder.replace( '/',"\\") for folder in train_results_folders]
+
+val_results_folders = [folder.replace( '/','\\') for folder in val_results_folders]
+
+
+baseline_val_results_folders = ['C:\\Users\\budai\\Downloads\\visualization\\visualization\\label_wise_metrics_new\\baseline_605_1']
+baseline_train_results_folders = ['C:\\Users\\budai\\Downloads\\visualization\\visualization\\label_wise_metrics_new\\train\\baseline_605_1']
+
+attribute = "ub-Shirt" # Specify the attribute here hs-BaldHead   ub-Jacket lb-Skirt
 scaling_amount = 100 # to scale down the std, as it is too big to be displayed when looking at specific attributes
 metric = "ma"  # Specify the metric here
 
@@ -43,9 +49,9 @@ for i, std in enumerate(val_results[metric].std):
 plt.plot(baseline_train_results[metric].mean, 'b--', label=f'baseline_train_{metric}', markersize=5)
 plt.plot(baseline_val_results[metric].mean, 'r--', label=f'baseline_val_{metric}', markersize=5)
 
-plt.legend()
+plt.legend(loc='best')  
 plt.ylim(0.6, 1)
-plt.xlim(0, 9)
+plt.xlim(0, 19)
 plt.grid(linewidth=1, linestyle='-', alpha=1)
 plt.minorticks_on()  # Enable minor ticks
 plt.grid(True, which='minor', linestyle='--', linewidth=0.5)  # Add minor gridlines
@@ -72,9 +78,9 @@ for i, std in enumerate(val_results[metric][attribute].std):
 plt.plot(baseline_train_results[metric][attribute].mean, 'b--', label=f'baseline_train_{metric}', markersize=5)
 plt.plot(baseline_val_results[metric][attribute].mean, 'r--', label=f'baseline_val_{metric}', markersize=5)
 
-plt.legend()
+plt.legend(loc='best')
 plt.ylim(0.6, 1)
-plt.xlim(0, 9)
+plt.xlim(0, 19)
 plt.grid(linewidth=1, linestyle='-', alpha=1)
 plt.minorticks_on()  # Enable minor ticks
 plt.grid(True, which='minor', linestyle='--', linewidth=0.5)  # Add minor gridlines
