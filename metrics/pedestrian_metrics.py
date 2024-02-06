@@ -69,57 +69,57 @@ def get_pedestrian_metrics(gt_label, preds_probs, attr_names, threshold=0.5, ind
     ################
     # label metrics
     # TP + FN
-    gt_pos = np.sum((gt_label == 1), axis=0).astype(float)
+    gt_pos = np.sum((gt_label == 1), axis=0).astype(float) #shape (num_attributes,)
     # TN + FP
-    gt_neg = np.sum((gt_label == 0), axis=0).astype(float)
+    gt_neg = np.sum((gt_label == 0), axis=0).astype(float)  #shape (num_attributes,)
     # TP
-    true_pos = np.sum((gt_label == 1) * (pred_label == 1), axis=0).astype(float)
+    true_pos = np.sum((gt_label == 1) * (pred_label == 1), axis=0).astype(float) #shape (num_attributes,)
     # TN
-    true_neg = np.sum((gt_label == 0) * (pred_label == 0), axis=0).astype(float)
+    true_neg = np.sum((gt_label == 0) * (pred_label == 0), axis=0).astype(float) #shape (num_attributes,)
     # FP
-    false_pos = np.sum(((gt_label == 0) * (pred_label == 1)), axis=0).astype(float)
+    false_pos = np.sum(((gt_label == 0) * (pred_label == 1)), axis=0).astype(float) #shape (num_attributes,)
     # FN
-    false_neg = np.sum(((gt_label == 1) * (pred_label == 0)), axis=0).astype(float)
+    false_neg = np.sum(((gt_label == 1) * (pred_label == 0)), axis=0).astype(float) #shape (num_attributes,)
 
-    label_pos_recall = 1.0 * true_pos / (gt_pos + eps)  # true positive
-    label_neg_recall = 1.0 * true_neg / (gt_neg + eps)  # true negative
+    label_pos_recall = 1.0 * true_pos / (gt_pos + eps)  # true positive #shape (num_attributes,)
+    label_neg_recall = 1.0 * true_neg / (gt_neg + eps)  # true negative #shape (num_attributes,)
     # mean accuracy
-    label_ma = (label_pos_recall + label_neg_recall) / 2
+    label_ma = (label_pos_recall + label_neg_recall) / 2 # mean accuracy #shape (num_attributes,)
 
-    result.label_pos_recall = label_pos_recall
-    result.label_neg_recall = label_neg_recall
-    result.label_prec = true_pos / (true_pos + false_pos + eps)
-    result.label_acc = true_pos / (true_pos + false_pos + false_neg + eps)
-    result.label_f1 = 2 * result.label_prec * result.label_pos_recall / (
-            result.label_prec + result.label_pos_recall + eps)
+    result.label_pos_recall = label_pos_recall #shape (num_attributes,)
+    result.label_neg_recall = label_neg_recall #shape (num_attributes,)
+    result.label_prec = true_pos / (true_pos + false_pos + eps) #shape (num_attributes,)
+    result.label_acc = true_pos / (true_pos + false_pos + false_neg + eps) #shape (num_attributes,)
+    result.label_f1 = 2 * result.label_prec * result.label_pos_recall / ( 
+            result.label_prec + result.label_pos_recall + eps) #shape (num_attributes,)
 
-    result.label_ma = label_ma
-    result.ma = np.mean(label_ma)
+    result.label_ma = label_ma #shape (num_attributes,)
+    result.ma = np.mean(label_ma) # mean accuracy #shape (1,)
     # get the attribute names in the order of the group_order and remove the batch dimension (duplicates)
     result.attr_names = [attr_names[idx][0] for idx in group_order]
 
     ################
     # instance metrics
-    gt_pos = np.sum((gt_label == 1), axis=1).astype(float)
-    true_pos = np.sum((pred_label == 1), axis=1).astype(float)
-    # true positive
-    intersect_pos = np.sum((gt_label == 1) * (pred_label == 1), axis=1).astype(float)
+    gt_pos = np.sum((gt_label == 1), axis=1).astype(float) #shape (num_instances,)
+    true_pos = np.sum((pred_label == 1), axis=1).astype(float) # true positive #shape (num_instances,)
+
+    intersect_pos = np.sum((gt_label == 1) * (pred_label == 1), axis=1).astype(float) #shape (num_instances,)
     # IOU
-    union_pos = np.sum(((gt_label == 1) + (pred_label == 1)), axis=1).astype(float)
+    union_pos = np.sum(((gt_label == 1) + (pred_label == 1)), axis=1).astype(float) #shape (num_instances,)
     # accuracy
-    instance_acc = intersect_pos / (union_pos + eps)
-    result.instance_acc = np.mean(instance_acc)
+    instance_acc = intersect_pos / (union_pos + eps) #shape (num_instances,)
+    result.instance_acc = np.mean(instance_acc) #shape (1,)
     # precision
-    instance_prec = intersect_pos / (true_pos + eps)
-    result.instance_prec = np.mean(instance_prec)
+    instance_prec = intersect_pos / (true_pos + eps) #shape (num_instances,)
+    result.instance_prec = np.mean(instance_prec) #shape (1,)
     # recall
-    instance_recall = intersect_pos / (gt_pos + eps)
-    result.instance_recall = np.mean(instance_recall)
+    instance_recall = intersect_pos / (gt_pos + eps) #shape (num_instances,)
+    result.instance_recall = np.mean(instance_recall) #shape (1,)
     # F1
-    result.instance_f1 = 2 * result.instance_prec * result.instance_recall / (result.instance_prec + result.instance_recall + eps)
+    result.instance_f1 = 2 * result.instance_prec * result.instance_recall / (result.instance_prec + result.instance_recall + eps) #shape (1,)
 
     # error, fn, fp
-    result.error_num = false_pos + false_neg
-    result.fn_num = false_neg
-    result.fp_num = false_pos
-    return result
+    result.error_num = false_pos + false_neg #shape (num_attributes,)
+    result.fn_num = false_neg #shape (num_attributes,)
+    result.fp_num = false_pos #shape (num_attributes,)
+    return result 
