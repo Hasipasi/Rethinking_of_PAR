@@ -466,11 +466,9 @@ def argument_parser():
                         type=int)
     parser.add_argument('--dist_bn', type=str, default='',
                         help='Distribute BatchNorm stats between nodes after each epoch ("broadcast", "reduce", or "")')
-
     parser.add_argument('--seed', type=int, default=605, help='random seed')
 
     args = parser.parse_args()
-
     return args
 
 

@@ -470,7 +470,6 @@ def argument_parser():
     parser.add_argument(
         "--cfg", help="decide which cfg to use", type=str,
         default="./configs/pedes_baseline/rap_zs.yaml",
-
     )
 
     parser.add_argument("--debug", type=str2bool, default="true")
@@ -479,11 +478,9 @@ def argument_parser():
     parser.add_argument('--dist_bn', type=str, default='',
                         help='Distribute BatchNorm stats between nodes after each epoch ("broadcast", "reduce", or "")')
     parser.add_argument('--pkl', type=str, default='./data/RAP2/bald_1000_w_zs.pkl', help='pickle file path, if empty use pkl from config file')
-    
     parser.add_argument('--seed', type=int, default=605, help='random seed')
 
     args = parser.parse_args()
-    print(f"args: {args}")
     return args
 
 
